@@ -10,9 +10,15 @@ El 15 de enero de 2018 un asesinato sacudió la aparente tranquilidad de SQL Cit
 Ante esta situación, la única fuente confiable para reconstruir los hechos son los registros almacenados en la base de datos del departamento de policía. Por ello, la investigación se ha centrado en examinar cuidadosamente cada tabla y cada registro, con la esperanza de que entre esos datos se encuentren pistas que conduzcan al culpable.
 
 > [!important]
-> **Estado del Caso:** En investigación.
+> **Estado del Caso:** Resuelto.
 
-## Resumen de la Investigación
+## Resumen del Caso
+La investigación del asesinato ocurrido el 15 de enero de 2018 en SQL City permitió identificar a Jeremy Bowers como el autor material del crimen. A través del análisis de testimonios, registros del gimnasio, datos de vehículos y otras tablas de la base de datos de la ciudad, se logró reconstruir la secuencia de los hechos.
+
+Durante su interrogatorio, Jeremy confesó haber sido contratado para cometer el asesinato, lo que condujo a descubrir a la verdadera responsable: Miranda Priestly, una mujer con altos ingresos que planificó y financió el crimen. 
+
+Con estas evidencias se determinó que Jeremy Bowers actuó como ejecutor, mientras que Miranda Priestly fue la mente maestra detrás del asesinato.
+
 
 ## Bitácora de Investigación
 ### Query 1 - Reportes del Día del Crimen
@@ -244,3 +250,258 @@ Esto convierte a Jeremy Bowers en el principal sospechoso del caso.
 
 >[!note]
 >El siguiente paso de la investigación será examinar más información sobre Jeremy Bowers, incluyendo posibles registros financieros u otros datos que puedan revelar si actuó solo o si alguien más estuvo involucrado en el crimen.
+
+### Query 7 - Explorando los Registros Financieros del Sospechoso
+```sql
+SELECT id, name, person.ssn, annual_income FROM person 
+JOIN income
+ON person.ssn = income.ssn
+WHERE name = "Jeremy Bowers";
+```
+
+**Evidencia**  
+![alt text](evidencia/paso7_registro_financiero_Jeremy_Bowers.png)
+
+**Anotación**  
+Con Jeremy Bowers convertido en el principal sospechoso tras el análisis de la matrícula del vehículo, decidí examinar un aspecto diferente de su perfil: su situación financiera.
+
+Antes de revisar su declaración, consideré prudente inspeccionar sus ingresos anuales registrados en la base de datos, ya que en muchas investigaciones se ha detectado que los problemas económicos pueden convertirse en un posible motivo para cometer un crimen.
+
+Por ello y con el fin de recuperar el registro financiero correspondiente a Jeremy Bowers, consulté la tabla income.
+
+>[!important]
+>**Resultado obtenido:**  
+>Se encontró un único registro financiero asociado al sospechoso:
+>- **Nombre:** Jeremy Bowers
+>- **Número de Seguro Social:** 871539279
+>- **Ingreso Anual:** 10,500
+
+**Conclusión**  
+La cifra resulta considerablemente baja, especialmente teniendo en cuenta que Jeremy Bowers tiene 30 años de edad.
+
+Un ingreso anual de 10,500 dólares podría indicar una situación económica complicada, particularmente si el individuo vive de una manera independiente. Aunque esta información no prueba nada por sí sola, sí plantea una posibilidad: un posible motivo económico.
+
+>[!warning]
+>Las cifras por si solas no son suficientes para demostrar culpabilidad.
+
+>[!note]
+>El siguiente paso será examinar la declaración de Jeremy Bowers, con el fin de determinar si su testimonio revela nuevas pistas o si intenta ocultar algo relacionado con el crimen.
+
+### Query 8 - La Confesión del Ejecutor
+```sql
+SELECT id, name, transcript FROM person 
+JOIN interview
+ON person.id = interview.person_id
+WHERE name = "Jeremy Bowers";
+```
+
+**Evidencia**  
+![alt text](evidencia/paso8_confesion_del_ejecutor.png)
+
+**Anotación**  
+Con Jeremy Bowers convertido en el principal sospechoso, el siguiente paso lógico era revisar su declaración oficial registrada en la base de datos.
+
+Para ello consulté la tabla interview, buscando específicamente la entrevista asociada al sospechoso.
+
+El objetivo era determinar si el sospechoso admitía algún tipo de implicación en el crimen o si su declaración contenia detalles que permitieran reconstruir mejor lo ocurrido.
+
+>[!important]
+>**Resultado de la declaración:**  
+>Jeremy Bowers confesó información crucial:
+>> *"Me contrató una mujer con mucho dinero. No sé su nombre, pero sé que mide entre 5'5" (65") o 5'7" (67"). Es pelirroja y conduce un Tesla Model S. Sé que asistió al SQL Symphony Concert tres veces en diciembre de 2017".*
+
+**Conclusión**  
+El asesinato no fue un acto impulsivo ni un accidente. Todo apunta a que fue un crimen planeado con anticipación.
+
+Jeremy Bowers no parece ser el autor intelectual del asesinato, sino el ejecutor contratado para llevarlo a cabo. Esto también refuerza la hipótesis planteada anteriormente: el dinero pudo haber sido su principal motivación.
+
+La declaración proporciona varias características clave sobre la verdadera mente detrás del crimen:
+
+- Mujer.
+- Cabello rojo.
+- Estatura entre 65 y 67 pulgadas.
+- Conduce un Tesla Model S.
+- Asistió tres veces al SQL Symphony Concert en diciembre de 2017.
+- Posee una gran cantidad de dinero.
+
+>[!warning]
+>Esto significa que el verdadero cerebro del asesinato sigue libre.
+>
+>Jeremy Bowers fue solo una pieza dentro de un plan mayor.
+
+
+>[!note]
+>El siguiente paso será utilizar estas características para rastrear a la misteriosa mujer en los registros de la ciudad. Especialmente será útil revisar los registros de características físicas similares a las de la mujer descrita.
+>
+> Si la base de datos contiene registros de asistencia a este evento, esa podría ser la pista definitiva para identificar al verdadero culpable.
+
+### Query 9 - Siguiendo el Rastro de la Autora Intelectual
+```sql
+SELECT drivers_license.id, name, gender, age, height, hair_color, car_make, car_model 
+FROM drivers_license 
+JOIN person
+ON drivers_license.id = person.license_id
+WHERE LOWER(gender) = "female" AND LOWER(hair_color) = "red"
+AND car_make = "Tesla" AND car_model = "Model S" 
+AND height BETWEEN 65 AND 67;
+```
+
+**Evidencia**  
+![alt text](evidencia/paso9_posibles_sospechosos_intelectuales.png)
+
+**Anotación**  
+La confesión de Jeremy Bowers proporcionó por primera vez una descripción clara de la persona que lo contrató.
+
+Aunque no conocía su nombre, sí recordaba varios detalles específicos: se trataba de una mujer de cabello rojo, con una estatura aproximada entre 65 y 67 pulgadas, que conducía un Tesla Model S.
+
+Con esta información decidí acudir a los registros de licencias de conducción de SQL City, ya que si la mujer realmente posee ese vehículo, su información debería aparecer registrada junto con sus características físicas.
+
+>[!important]
+>**Resultado búsqueda:**  
+>La consulta redujo la lista a tres posibles candidatas:
+>- Red Korb con ID 918773, estatura 65" y 48 años.
+>- Regina George con ID 291182, estatura 66" y 65 años.
+>- Miranda Priestly con ID 202298, estatura 66" y 68 años.
+
+**Conclusión**  
+El caso comienza a cerrarse.
+
+De los 10007 registros de licencias en la ciudad, solo tres mujeres cumplen exactamente con la descripción proporcionada por Jeremy. Esto sugiere que la autora intelectual del asesinato probablemente se encuentra entre estas tres entidades.
+
+Sin embargo, aún falta una pieza clave del rompecabezas: Jeremy también mencionó que la mujer asistió tres veces al SQL Symphony Concert durante diciembre de 2017. 
+
+Ese detalle es demasiado específico para ignorarlo.
+
+>[!warning]
+>Si logramos identificar cuál de estas tres mujeres asistió repetidamente a ese concierto, podremos identificar con certeza a la persona que planeó el asesinato y así cerrar el caso.
+
+
+>[!note]
+>El siguiente paso será consultar los registros de asistencia a eventos para verificar si alguna de estas tres personas aparece asociada al SQL Symphony Concert en 2017.
+
+
+### Query 10 - Identificando a la Mente Maestra
+```sql
+SELECT person_id, name, annual_income, COUNT(*) AS veces_concierto 
+FROM facebook_event_checkin JOIN person
+ON facebook_event_checkin.person_id = person.id
+JOIN income
+ON person.ssn = income.ssn
+WHERE event_name = "SQL Symphony Concert" 
+AND date LIKE "201712%"
+GROUP BY person_id, name, annual_income 
+HAVING COUNT(*) = 3;
+```
+
+**Evidencia**  
+![alt text](evidencia/paso10_identificacion_mente_maestra.png)
+
+**Anotación**  
+La última pista proporcionada por Jeremy Bowers era particularmente específica: la mujer que lo contrató había asistido tres veces al SQL Symphony Concert durante diciembre de 2017.
+
+Con esa información decidí examinar los registros de facebook_event_checkin, donde se almacenan los eventos a los que han asistido los ciudadanos de SQL City.
+
+La consulta se centró exclusivamente en:
+
+- El evento SQL Symphony Concert.
+- Fechas correspondientes a diciembre de 2017.
+- Personas que asistieron exactamente tres veces.
+
+Además, decidí enlazar estos registros con la tabla income con el fin de verificar si la persona identificada coincidía con la descripción de Jeremy: una mujer con mucho dinero.
+
+>[!important]
+>**Resultado búsqueda:**  
+>La consulta produjo un único resultado:
+>- Miranda Priestly, con un ingreso anual de 310,000
+
+**Conclusión**  
+Todas las piezas del rompecabezas finalmente encajan.
+
+La persona identificada, Miranda Priestly, cumple cada una de las condiciones reveladas durante la investigación:
+
+- Coinicide con la descripción física obtenida a partir de los registros de licencias.
+- Conduce un Tesla Model S.
+- Posee cabello rojo y estatura aproximada mencionada por Jeremy.
+- Tiene un ingreso anual extremadamente alto, lo que concuerda con la afirmación de que *"era una mujer con mucho dinero"*.
+- Y, finalmente, asistió exactamente tres veces al SQL Symphony Concert en diciembre de 2017, tal como afirmó el ejecutor del crimen.
+
+
+>[!important]
+>Con toda la evidencia reunida queda claro que Miranda Priestly es la autora intelectual del asesinato.
+>
+>Jeremy Bowers actuó únicamente como el ejecutor contratado, mientras que ella fue quien planeó y financió el crimen.
+
+### Query 11 - Confirmación del Asesino
+```sql
+INSERT INTO solution VALUES (1, 'Jeremy Bowers');
+
+SELECT value FROM solution;
+```
+
+**Evidencia**  
+![alt text](evidencia/paso11_confirmacion_asesino.png)
+
+**Anotación**  
+Tras reunir múltiples pistas (los testimonios de los testigos, los registros del gimnasio, la coincidencia con la matrícula del vehículo y finalmente la declaración del propio sospechoso), todas las evidencias apuntaban hacia Jeremy Bowers como el autor material del crimen.
+
+Para confirmar oficialmente esta conclusión dentro del sistema de investigación, procedí a registrar su nombre en la tabla solution, utilizada por la plataforma para verificar si el culpable identificado coincide con el asesino real.
+
+>[!important]
+>**Resultado de la verificación:**  
+>El sistema respondió con el siguiente mensaje: 
+>
+>*¡Felicidades, encontraste al asesino!*.  
+>
+>Esta confirmación indica que Jeremy Bowers es efectivamente el asesino que ejecutó el crimen.
+
+**Conclusión**  
+Con esta verificación queda demostrado que la investigación siguió el rastro correcto. Sin embargo, el propio Jeremy dejó claro que no actuó por iniciativa propia.
+
+>[!important]
+>A lo largo de la investigación ya se logró identificar a una posible autora intelectual: Miranda Priestly, quien coincide con todas las características descritas por Jeremy y con los registros del concierto.
+
+>[!note]
+>Aún falta realizar la verificación final dentro del sistema para verificar oficialmente que Miranda Priestly es la verdadera mente maestra detrás del crimen.
+
+### Query 12 - Confirmación de la Mente Maestra
+```sql
+INSERT INTO solution VALUES (1, 'Miranda Priestly');
+
+SELECT value FROM solution;
+```
+
+**Evidencia**  
+![alt text](evidencia/paso12_confirmacion_mente_maestra.png)
+
+**Anotación**  
+Tras seguir cada pista con precisión (desde los testimonios de Jeremy Bowers hasta los registros de eventos de la ciudad), todas las evidencias apuntaban hacia Miranda Priestly como la persona que había planeado el asesinato.
+
+Jeremy Bowers había confesado que fue contratado por una mujer con mucho dinero, describiéndola además con varias características muy concretas: cabello rojo, estatura aproximada entre 65 y 67 pulgadas, propietaria de un Tesla Model S y asistente frecuente al SQL Symphony Concert en diciembre de 2017.
+
+Las consultas realizadas en las tablas de drivers_license y facebook_event_checkin perimitieron identificar a una única persona que coincidía con todos esos elementos. Sin embargo, como en todo buen caso policial, era necesario confirmar oficialmente la conclusión dentro del sistema de investigación.
+
+Para ello se registró el nombre de la sospechosa en la tabla solution, del mismo modo en que se había hecho previamente con el asesino material.
+
+>[!important]
+>**Resultado de la verificación:**  
+>El sistema respondió con el siguiente mensaje: 
+>
+>*¡Felicidades, encontraste al cerebro detrás del asesinato! En SQL City, todos te aclaman como el mejor detective de SQL de todos los tiempos. ¡Es hora de descorchar el champán!*.  
+>
+>Esta confirmación indica que Miranda Priestly es efectivamente la mente maestra detrás del crimen.
+
+**Conclusión**  
+El caso finalmente queda completamente solucionado:
+
+- Jeremy Bowers fue el asesino material, quien ejecutó el crimen.
+
+- Miranda Priestly fue la mente maestra, quien planificó y financió el asesinato.
+
+Cada pieza de información permitió reconstruir cuidadosamente los hechos hasta revelar la verdad.
+
+Lo que comenzó como un caso complicado, con un informe de escena de crimen perdido, terminó resolviéndose gracias a un meticuloso análisis de los datos almacenados en la base de SQL City.
+
+>[!important]
+>**Estado del Caso:** Resuelto
+>
+>Los responsables han sido identificados y la investigación puede darse por concluida.

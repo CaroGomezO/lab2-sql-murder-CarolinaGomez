@@ -109,3 +109,86 @@ WHERE plate_number LIKE ("%H42W%") AND LOWER(gender) = "male";
 -- ON get_fit_now_check_in.membership_id = get_fit_now_member.id
 -- WHERE check_in_date = 20180109;
 ----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 7. Se buscó en las licencias del pueblo una que tuviera la secuencia "H42W" y cuyo 
+-- dueño fuera un hombre.
+
+-- Conclusión: El resultado arrojó dos personas, una que no estuvo en el gimnasio el 9 de enero y 
+-- la otra se identificó como Jeremy Bowers
+
+-- Captura: paso7_registro_financiero_Jeremy_Bowers.png
+
+SELECT id, name, person.ssn, annual_income FROM person 
+JOIN income
+ON person.ssn = income.ssn
+WHERE name = "Jeremy Bowers";
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 8. Se buscó el registro de la declaración de Jeremy Bowers para identificar si efectivamente
+-- es el responsable del crimen
+
+-- Conclusión: Jeremy Bowers es el ejecutor. Fue contratado por una mujer con mucho dinero.
+
+-- Captura: paso8_confesion_del_ejecutor.png
+
+SELECT id, name, transcript FROM person 
+JOIN interview
+ON person.id = interview.person_id
+WHERE name = "Jeremy Bowers";
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- SELECT COUNT(id) FROM drivers_license;
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 10. Teniendo en cuenta el detalle de que la mente maestra fue tres veces al SQL Symphony Concert, 
+-- se procedió a buscar a la persona que cumpliera con esto y al mismo tiempo con las características 
+-- físicas descritas por Jeremy
+
+-- Conclusión: Hubo un único resultado que indica que la mente maestra posiblemente es Miranda Priestly
+
+-- Captura: paso10_identificacion_mente_maestra.png
+
+SELECT person_id, name, annual_income, COUNT(*) AS veces_concierto 
+FROM facebook_event_checkin JOIN person
+ON facebook_event_checkin.person_id = person.id
+JOIN income
+ON person.ssn = income.ssn
+WHERE event_name = "SQL Symphony Concert" 
+AND date LIKE "201712%"
+GROUP BY person_id, name, annual_income 
+HAVING COUNT(*) = 3;
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 11. Confirmación del asesino mediante pistas otorgadas por los testigos
+
+-- Conclusión: Se registró a Jeremy Bowers como el asesino 
+
+-- Captura: paso11_confirmacion_asesino.png
+
+INSERT INTO solution VALUES (1, 'Jeremy Bowers');
+
+SELECT value FROM solution;
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 11. Confirmación de la mente maestra mediante pistas ortorgadas por el ejecutor Jeremy Bowers
+
+-- Conclusión: Se registró a Miranda Priestly como la mente maestra 
+
+-- Captura: paso12_confirmacion_mente_maestra.png
+
+INSERT INTO solution VALUES (1, 'Miranda Priestly');
+
+SELECT value FROM solution;
+----------------------------------------------------------------------------------------------------------
