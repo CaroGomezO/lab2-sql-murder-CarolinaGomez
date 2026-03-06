@@ -32,7 +32,7 @@ Un crimen rara vez ocurre de forma aislada. A veces forma parte de algo más gra
 Al ejecutar la consulta, aparecieron tres registros correspondientes a esa fecha: dos reportes de asalto y un reporte de asesinato. Sin embargo, el reporte de asesinato contenía un detalle que llamó enormemente mi atención.
 
 >[!important]
->**Pista clave encontrada en el reporte**  
+>**Pista clave encontrada en el reporte:**  
 >Las cámaras de seguridad muestran dos personas que fueron testigos del crimen:
 >- El primer testigo vive en la última casa de Northwestern Dr.
 >- El segundo testigo, llamado Annabel, vive en algún lugar de Franklin Ave.
@@ -116,7 +116,7 @@ Según su testimonio:
 >"Vi ocurrir el asesinato y reconocí al asesino en mi gimnasio cuando estaba entrenando la semana pasada, el 9 de enero".
 
 >[!important]
->**Nueva Pista Obtenida del Testimonio** 
+>**Nueva pista obtenida del testimonio:** 
 >- Annabel reconoció al asesino en el gimnasio donde entrena.
 >- Lo vio allí el 9 de enero, apenas seis días antes del asesinato.
 
@@ -130,4 +130,117 @@ El detalle de la fecha también llama la atención. Annabel recuerda haber visto
 >[!note]
 >Con ambos testimonios apuntando al mismo lugar, el siguiente paso de la investigación será examinar los registros del gimnasio *Get Fit Now Gym* en busca de miembros cuya información coincida con las pistas proporcionadas por los testigos.
 
+### Query 4 - Investigando los Registros del Gimnasio 
+```sql
+SELECT * FROM get_fit_now_member 
+WHERE id LIKE "48Z__" AND LOWER(membership_status) = "gold"; 
+```
 
+**Evidencia**  
+![alt text](evidencia/paso4_reporte_gimnasio.png)
+
+**Anotación**  
+Ambos testimonios apuntaban en la misma dirección: el gimnasio *"Get Fit Now Gym"*.
+
+El primer testigo mencionó que el sospechoso llevaba una bolsa del gimnasio cuyo número de membresía comenzaba con "48Z" y que solo los miembros Gold poseen ese tipo de bolsa.
+
+Al revisar la tabla get_fit_now_member, noté que los identificadores de membresía tenían una longitud de cinco caracteres y con ello logré construir un filtro más preciso: buscar membresías que comenzaran con "48Z" y tuvieran exactamente dos caracteres adicionales, y estuvieran clasificadas como Gold.
+
+El resultado redujo considerablemente la lista de posibles sospechosos.
+
+
+>[!important]
+>**Miembros que coinciden con la descripción del testigo:**  
+>- Joe Germuska - ID Membresía = 48Z7A
+>- Jeremy Bowers - ID Membresía = 48Z55
+
+**Conclusión**  
+Por el momento ambos individuos cumplen con las condiciones mencionadas por los testigos: son miembros Gold del gimnasio y su número de membresía comienza con "48Z". Sin embargo, esto aún no es suficiente para determinar cuál de los dos es el responsable.
+
+Afortunadamente, el testimonio de Annabel Miller proporciona un detalle adicional que puede ayudar a reducir aún más la lista: ella afirmó haber visto al sospechoso en el gimnasio el 9 de enero.
+
+Si alguno de estos miembros estuvo presente en el gimnasio ese día, podría tratarse de nuestro sospechoso.
+
+>[!note]
+>El siguiente paso será revisar los registros de entrada al gimnasio para determinar cuál de estos miembros visitó el establecimiento el 9 de enero, tal como lo mencionó Annabel en su declaración.
+
+### Query 5 - Verificando Check In del Gimnasio 
+```sql
+SELECT membership_id, membership_status, name, check_in_date, check_in_time, check_out_time 
+FROM get_fit_now_check_in 
+JOIN get_fit_now_member
+ON get_fit_now_check_in.membership_id = get_fit_now_member.id
+WHERE id LIKE "48Z__" 
+AND LOWER(membership_status) = "gold" 
+AND check_in_date = 20180109; 
+```
+
+**Evidencia**  
+![alt text](evidencia/paso5_check_in_gimnasio.png)
+
+**Anotación**  
+La declaración de Annabel Miller indicaba que había visto al sospechoso en el gimnasio el 9 de enero.
+
+Con esa información, decidí revisar los registros de entrada al gimnasio corresponiente a esa fecha, enfocándome únicamente en los dos miembros Gold cuyo número de membresía comenzaba con "48Z".
+
+El objetivo era comprobar cuál de los dos había estado presente ese día, tal como mencionó la testigo.
+
+
+>[!important]
+>**Resultado de la verificación:**  
+>Ambos miembros estuvieron en el gimnasio el 9 de enero de 2018:
+>- Joe Germuska ingresó a las 16:00 y salió a las 17:30.
+>- Jeremy Bowers ingresó a las 15:30 y salió a las 17:00.
+
+**Conclusión**  
+La verificación confirma que ambos individuos estuvieron en el gimnasio el mismo día mencionado por Annabel. Esto significa que los dos siguen siendo posibles sospechosos, ya que ninguno puede descartarse basándose únicamente en esta pista.
+
+Por lo tanto, será necesario recurrir al último detalle proporcionado por el primer testigo: la placa parcial del vehículo utilizado en la huida, que contenía la secuencia "H42W".
+
+>[!note]
+>El siguiente paso de la investigación será examinar los registros de vehículos de la ciudad para identificar autos cuya placa contenga "H42W".  
+>Esta pista podría permitir vincular definitivamente a uno de los sospechosos con la escena del crimen.
+
+### Query 6 - Siguiendo la Pista de la Matrícula
+```sql
+SELECT license_id, plate_number, name, age, height, eye_color, hair_color,
+plate_number, car_make, car_model 
+FROM drivers_license
+JOIN person
+ON drivers_license.id = person.license_id
+WHERE plate_number LIKE ("%H42W%") AND LOWER(gender) = "male"; 
+```
+
+**Evidencia**  
+![alt text](evidencia/paso6_reporte_matricula_auto.png)
+
+**Anotación**  
+El primer testigo afirmó haber visto a un hombre salir de la escena del crimen subiendo a un vehículo cuya matrícula contenía la secuencia "H42W".
+
+Con esta información, decidí consultar los registros de licencias de conducir y vehículos de la ciudad, filtrando únicamente conductores masculinos cuyas placas incluyeran esa cadena específica.
+
+El objetivo era identificar posibles coincidencias que pudieran relacionarse con los sospechosos que ya habían aparecido en la investigación.
+
+
+>[!important]
+>**Resultado de la búsqueda:**  
+>Se encontraron dos conductores con matrículas que contienen la secuencia "H42W":
+>- Tushar Chandra, que conduce un Nissan Altima con placa 4H42WR
+>- Jeremy Bowers, que conduce un Chevrolet Spark LS con placa 0H42W2
+
+**Conclusión**  
+Al comparar estos resultados con las pistas obtenidas anteriormente, surge un detalle clave: aunque ambos vehículos coinciden con la matrícula parcial, solo Jeremy Bowers aparece en los registros del gimnasio el 9 de enero de 2018, la misma fecha mencionada por Annabel Miller.
+
+Por otro lado, Tushar Chandra no aparece en los registros del gimnasio, lo que debilita cualquier conexión directa con la declaración de la testigo.
+
+Todo apunta a que Jeremy Bowers encaja con todas las pistas hasta ahora:
+
+- Es hombre, tal como indicó Morty, el primer testigo.
+- Su matrícula contiene la secuencia "H42W".
+- Estuvo en el gimnasio el 9 de enero, la fecha mencionada por Annabel.
+- Es miembro Gold del gimnasio y su id de membresía comienza por "48Z"
+
+Esto convierte a Jeremy Bowers en el principal sospechoso del caso.
+
+>[!note]
+>El siguiente paso de la investigación será examinar más información sobre Jeremy Bowers, incluyendo posibles registros financieros u otros datos que puedan revelar si actuó solo o si alguien más estuvo involucrado en el crimen.

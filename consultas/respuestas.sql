@@ -46,3 +46,66 @@ JOIN interview
 ON person.id = interview.person_id
 WHERE name LIKE "%Annabel%" AND address_street_name = "Franklin Ave";
 ----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- SELECT * FROM get_fit_now_member; 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 4. Se buscó en los registros del gimnasio la persona con id de membresía que comenzaba con 48Z 
+-- y tenía una membresía gold, de acuerdo a lo dicho por el testigo Morty Schapiro.
+
+-- Conclusión: Se encontraron dos personas que coincidían con dos características dichas 
+-- por el testigo Morty Schapiro
+
+-- Captura: paso4_reporte_gimnasio.png
+
+SELECT * FROM get_fit_now_member 
+WHERE id LIKE "48Z__" AND LOWER(membership_status) = "gold"; 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 5. Se buscó en los registros del check in del gimnasio la persona con id de membresía que comenzaba 
+-- con 48Z, tenía una membresía gold y estuvo en el gimnasio el día 9 de enero.
+
+-- Conclusión: El resultado arrojó a las mismas dos personas que se encontraron en el paso 4
+
+-- Captura: paso5_check_in_gimnasio.png
+
+SELECT membership_id, membership_status, name, check_in_date, check_in_time, check_out_time 
+FROM get_fit_now_check_in 
+JOIN get_fit_now_member
+ON get_fit_now_check_in.membership_id = get_fit_now_member.id
+WHERE id LIKE "48Z__" 
+AND LOWER(membership_status) = "gold" 
+AND check_in_date = 20180109; 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 6. Se buscó en las licencias del pueblo una que tuviera la secuencia "H42W" y cuyo 
+-- dueño fuera un hombre.
+
+-- Conclusión: El resultado arrojó dos personas, una que no estuvo en el gimnasio el 9 de enero y 
+-- la otra se identificó como Jeremy Bowers
+
+-- Captura: paso6_reporte_matricula_auto.png
+
+SELECT license_id, plate_number, name, age, height, eye_color, hair_color,
+plate_number, car_make, car_model 
+FROM drivers_license
+JOIN person
+ON drivers_license.id = person.license_id
+WHERE plate_number LIKE ("%H42W%") AND LOWER(gender) = "male"; 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- SELECT name FROM get_fit_now_check_in 
+-- JOIN get_fit_now_member
+-- ON get_fit_now_check_in.membership_id = get_fit_now_member.id
+-- WHERE check_in_date = 20180109;
+----------------------------------------------------------------------------------------------------------
