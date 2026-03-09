@@ -1,7 +1,8 @@
 ----------------------------------------------------------------------------------------------------------
--- 1. Se identificaron todos los reportes de incidentes registrados en SQL City el 15 de enero de 2018.
+-- 1. Se identificaron los reportes de crímenes registrados en SQL City el 15 de enero de 2018.
 
--- Conclusión: Se encontraron dos testigos del asesinato.
+-- Conclusión: Se encontró el reporte del asesinato y se identificaron dos testigos que podrían
+-- aportar información clave para la investigación.
 
 -- Captura: paso1_reporte.png
 
@@ -16,12 +17,13 @@ WHERE date = 20180115 AND LOWER(city) = "sql city";
 
 
 ----------------------------------------------------------------------------------------------------------
--- 2. Se identificó el primer testigo ordenando las direcciones de la calle Northwestern Dr
--- de mayor a menor y se seleccionó únicamente el primer resultado.
+-- 2. Se identificó al primer testigo consultando las personas que viven en Northwestern Dr, ordenando
+-- las direcciones de mayor a menor y seleccionando la primera casa que aparecía luego del ordenamiento
+-- para así encontrar a la persona que vive en la última casa de la calle.
 
--- Conclusión: Se descubrió que el sospechoso era un hombre que llevaba una bolsa del 
--- gimnasio Get Fit Now Gym, tenía un número de membresía que comenzaba con "48Z" y se subió 
--- a un auto que contenía la secuencia "H42W".
+-- Conclusión: El testigo indicó que el sospechoso llevaba una bolsa del gimnasio Get Fit Now Gym, tenía
+-- un número de membresía que comenzaba con "48Z" y escapó en un vehículo cuya placa contenía la
+-- secuencia "H42W".
 
 -- Captura: paso2_testigo_Northwestern_Dr.png
 
@@ -34,10 +36,10 @@ ORDER BY address_number DESC LIMIT 1;
 
 
 ----------------------------------------------------------------------------------------------------------
--- 3. Se identificó el segundo testigo del crimen: una persona llamada Annabel que vivía en Franklin Ave.
+-- 3. Se identificó el segundo testigo del crimen, una persona llamada Annabel que vive en Franklin Ave.
 
--- Conclusión: Mediante la declaración de Annabel, se confirmó que el sospechoso
--- tenía un vínculo con el gimnasio Get Fit Now Gym
+-- Conclusión: Annabel declaró haber visto al sospechoso en el gimnasio Get Fit Now Gym días antes
+-- del asesinato.
 
 -- Captura: paso3_testigo_Annabel_Franklin_Ave.png
 
@@ -54,11 +56,10 @@ WHERE name LIKE "%Annabel%" AND address_street_name = "Franklin Ave";
 
 
 ----------------------------------------------------------------------------------------------------------
--- 4. Se buscó en los registros del gimnasio la persona con id de membresía que comenzaba con 48Z 
--- y tenía una membresía gold, de acuerdo a lo dicho por el testigo Morty Schapiro.
+-- 4. Se buscaron en los registros del gimnasio los miembros cuya membresía comenzara con "48Z" y
+-- cuyo estado fuera "gold", de acuerdo con la descripción dada por el testigo.
 
--- Conclusión: Se encontraron dos personas que coincidían con dos características dichas 
--- por el testigo Morty Schapiro
+-- Conclusión: Se encontraron dos posibles sospechosos que cumplían con las características mencionadas.
 
 -- Captura: paso4_reporte_gimnasio.png
 
@@ -68,10 +69,12 @@ WHERE id LIKE "48Z__" AND LOWER(membership_status) = "gold";
 
 
 ----------------------------------------------------------------------------------------------------------
--- 5. Se buscó en los registros del check in del gimnasio la persona con id de membresía que comenzaba 
--- con 48Z, tenía una membresía gold y estuvo en el gimnasio el día 9 de enero.
+-- 5. Se revisaron los registros de entrada al gimnasio para determinar qué miembros tienen membresía que
+-- comienza con "48Z", tienen estado "gold" y estuvieron presentes en el gimnasio el 9 de enero de 2018, 
+-- fecha mencionada por el segundo testigo.
 
--- Conclusión: El resultado arrojó a las mismas dos personas que se encontraron en el paso 4
+-- Conclusión: Ambos sospechosos, obtenidos en la consulta anterior, estuvieron en el gimnasio ese día,
+-- por lo que ninguno pudo ser descartado todavía.
 
 -- Captura: paso5_check_in_gimnasio.png
 
@@ -86,11 +89,11 @@ AND check_in_date = 20180109;
 
 
 ----------------------------------------------------------------------------------------------------------
--- 6. Se buscó en las licencias del pueblo una que tuviera la secuencia "H42W" y cuyo 
--- dueño fuera un hombre.
+-- 6. Se investigaron los registros de licencias de conducir buscando vehículos cuya 
+-- placa contuviera la secuencia "H42W" y cuyo propietario fuera un hombre.
 
--- Conclusión: El resultado arrojó dos personas, una que no estuvo en el gimnasio el 9 de enero y 
--- la otra se identificó como Jeremy Bowers
+-- Conclusión: Se encontraron dos personas. Al cruzar esta información con los registros del gimnasio, 
+-- uno de ellos fue descartado y el sospechoso restante fue identificado como Jeremy Bowers.
 
 -- Captura: paso6_reporte_matricula_auto.png
 
@@ -112,11 +115,12 @@ WHERE plate_number LIKE ("%H42W%") AND LOWER(gender) = "male";
 
 
 ----------------------------------------------------------------------------------------------------------
--- 7. Se buscó en las licencias del pueblo una que tuviera la secuencia "H42W" y cuyo 
--- dueño fuera un hombre.
+-- 7. Se consultaron los registros financieros de Jeremy Bowers con el fin de
+-- conocer su situación económica y evaluar si podría existir un posible motivo
+-- relacionado con dinero.
 
--- Conclusión: El resultado arrojó dos personas, una que no estuvo en el gimnasio el 9 de enero y 
--- la otra se identificó como Jeremy Bowers
+-- Conclusión: Se encontró que sus ingresos anuales eran relativamente bajos, lo que podría
+-- indicar que, si cometió el crimen, aceptó hacerlo a cambio de dinero.
 
 -- Captura: paso7_registro_financiero_Jeremy_Bowers.png
 
@@ -128,10 +132,10 @@ WHERE name = "Jeremy Bowers";
 
 
 ----------------------------------------------------------------------------------------------------------
--- 8. Se buscó el registro de la declaración de Jeremy Bowers para identificar si efectivamente
--- es el responsable del crimen
+-- 8. Se revisó la declaración de Jeremy Bowers para confirmar su participación en el crimen.
 
--- Conclusión: Jeremy Bowers es el ejecutor. Fue contratado por una mujer con mucho dinero.
+-- Conclusión: Jeremy confesó ser el ejecutor del asesinato y declaró haber sido contratado
+-- por una mujer con mucho dinero.
 
 -- Captura: paso8_confesion_del_ejecutor.png
 
@@ -148,11 +152,30 @@ WHERE name = "Jeremy Bowers";
 
 
 ----------------------------------------------------------------------------------------------------------
--- 10. Teniendo en cuenta el detalle de que la mente maestra fue tres veces al SQL Symphony Concert, 
--- se procedió a buscar a la persona que cumpliera con esto y al mismo tiempo con las características 
--- físicas descritas por Jeremy
+-- 9. A partir de la descripción dada por Jeremy, se buscó en las licencias de conducir 
+-- mujeres con cabello rojo, estatura entre 65 y 67 pulgadas y que condujeran un Tesla Model S.
 
--- Conclusión: Hubo un único resultado que indica que la mente maestra posiblemente es Miranda Priestly
+-- Conclusión: Se encontraron tres posibles candidatas que coincidían con la descripción
+-- de la posible mente maestra.
+
+-- Captura: paso9_posibles_sospechosos_intelectuales.png
+
+SELECT drivers_license.id, name, gender, age, height, hair_color, car_make, car_model 
+FROM drivers_license 
+JOIN person
+ON drivers_license.id = person.license_id
+WHERE LOWER(gender) = "female" AND LOWER(hair_color) = "red"
+AND car_make = "Tesla" AND car_model = "Model S" 
+AND height BETWEEN 65 AND 67;
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+-- 10. Considerando que la mente maestra asistió tres veces al SQL Symphony Concert en 
+-- diciembre de 2017, se buscaron las persoans que cumplieran con ese patrón de asistencia.
+
+-- Conclusión: Se obtuvo un único resultado: Miranda Priestly, quien además posee altos
+-- ingresos, lo que coincide con la descripción dada por Jeremy.
 
 -- Captura: paso10_identificacion_mente_maestra.png
 
@@ -169,9 +192,9 @@ HAVING COUNT(*) = 3;
 
 
 ----------------------------------------------------------------------------------------------------------
--- 11. Confirmación del asesino mediante pistas otorgadas por los testigos
+-- 11. Confirmación del asesino mediante el sistema de verificación.
 
--- Conclusión: Se registró a Jeremy Bowers como el asesino 
+-- Conclusión: Se confirmó oficialmente que Jeremy Bowers es el asesino.
 
 -- Captura: paso11_confirmacion_asesino.png
 
@@ -182,9 +205,9 @@ SELECT value FROM solution;
 
 
 ----------------------------------------------------------------------------------------------------------
--- 11. Confirmación de la mente maestra mediante pistas ortorgadas por el ejecutor Jeremy Bowers
+-- 12. Confirmación de la mente maestra del crimen mediante el sistema de verificación.
 
--- Conclusión: Se registró a Miranda Priestly como la mente maestra 
+-- Conclusión: Se confirmó oficialmente que Miranda Priestly es la autora intelectual del asesinato.
 
 -- Captura: paso12_confirmacion_mente_maestra.png
 

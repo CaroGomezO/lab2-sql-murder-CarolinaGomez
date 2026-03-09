@@ -1,16 +1,13 @@
 # lab2-sql-murder-CarolinaGomez
 
-## Pefil del Detective
+## Perfil del Detective
 - **Nombre**: Carolina Gómez Osorno
 - **Correo**: cgomez.osorno@udea.edu.co
 
 ## Contexto de la Investigación
 El 15 de enero de 2018 un asesinato sacudió la aparente tranquilidad de SQL City. Como suele ocurrir en estos casos, todo comenzó con el informe inicial de la escena del crimen; sin embargo, dicho informe se extravió, dejando a la investigación sin un punto de partida.
 
-Ante esta situación, la única fuente confiable para reconstruir los hechos son los registros almacenados en la base de datos del departamento de policía. Por ello, la investigación se ha centrado en examinar cuidadosamente cada tabla y cada registro, con la esperanza de que entre esos datos se encuentren pistas que conduzcan al culpable.
-
-> [!important]
-> **Estado del Caso:** Resuelto.
+Ante esta situación, la única fuente confiable para reconstruir los hechos fueron registros almacenados en la base de datos del departamento de policía. Por ello, la investigación se ha centrado en examinar cuidadosamente cada tabla y cada registro, con la esperanza de que entre esos datos se encuentren pistas que conduzcan al culpable.
 
 ## Resumen del Caso
 La investigación del asesinato ocurrido el 15 de enero de 2018 en SQL City permitió identificar a Jeremy Bowers como el autor material del crimen. A través del análisis de testimonios, registros del gimnasio, datos de vehículos y otras tablas de la base de datos de la ciudad, se logró reconstruir la secuencia de los hechos.
@@ -19,6 +16,8 @@ Durante su interrogatorio, Jeremy confesó haber sido contratado para cometer el
 
 Con estas evidencias se determinó que Jeremy Bowers actuó como ejecutor, mientras que Miranda Priestly fue la mente maestra detrás del asesinato.
 
+> [!important]
+> **Estado del Caso:** Resuelto.
 
 ## Bitácora de Investigación
 ### Query 1 - Reportes del Día del Crimen
@@ -64,7 +63,7 @@ ORDER BY address_number DESC LIMIT 1;
 ![alt text](evidencia/paso2_testigo_Northwestern_Dr.png)
 
 **Anotación**  
-El informe del asesinato mencionaba que uno de los testigos vivía en la última casa de Nothwestern Dr.
+El informe del asesinato mencionaba que uno de los testigos vivía en la última casa de Northwestern Dr.
 
 En lugar de revisar a todos los residentes de la calle, decidí aprovechar ese detalle del informe. Si podía identificar la casa con el número más alto, encontraría directamente a la persona que vivía en el extremo de la calle.
 
@@ -74,7 +73,7 @@ Para lograrlo, consulté las tablas *person* e *interview*, ordenando las direcc
 >**Testigo identificado: Morty Schapiro**  
 
 **Declaración del Testigo**  
-Morty declaró haber eschuchado un disparo y haber visto a un hombre salir corriendo del lugar del crimen. Durante su testimonio proporcionó varios detalles importantes sobre el sospechoso.
+Morty declaró haber escuchado un disparo y haber visto a un hombre salir corriendo del lugar del crimen. Durante su testimonio proporcionó varios detalles importantes sobre el sospechoso.
 
 >[!important]
 >**Detalles proporcionados por el testigo:** 
@@ -127,7 +126,7 @@ Según su testimonio:
 >- Lo vio allí el 9 de enero, apenas seis días antes del asesinato.
 
 **Conclusión**  
-La declaración de Annabel resulta particularmente intersante porque confirma parcialmente lo dicho por el primer testigo. Morty Schapiro mencionó que el sospechoso llevaba una bolsa del gimnasio *Get Fit Now Gym*, mientras que Annabel asegura haber reconocido al asesino precisamente en su gimnasio.
+La declaración de Annabel resulta particularmente interesante porque confirma parcialmente lo dicho por el primer testigo. Morty Schapiro mencionó que el sospechoso llevaba una bolsa del gimnasio *Get Fit Now Gym*, mientras que Annabel asegura haber reconocido al asesino precisamente en su gimnasio.
 
 Dos testigos apuntan hacia la misma pista: el gimnasio.
 
@@ -150,10 +149,9 @@ Ambos testimonios apuntaban en la misma dirección: el gimnasio *"Get Fit Now Gy
 
 El primer testigo mencionó que el sospechoso llevaba una bolsa del gimnasio cuyo número de membresía comenzaba con "48Z" y que solo los miembros Gold poseen ese tipo de bolsa.
 
-Al revisar la tabla get_fit_now_member, noté que los identificadores de membresía tenían una longitud de cinco caracteres y con ello logré construir un filtro más preciso: buscar membresías que comenzaran con "48Z" y tuvieran exactamente dos caracteres adicionales, y estuvieran clasificadas como Gold.
+Al revisar la tabla *get_fit_now_member*, noté que los identificadores de membresía tenían una longitud de cinco caracteres y con ello logré construir un filtro más preciso: buscar membresías que comenzaran con "48Z", tuvieran exactamente dos caracteres adicionales y estuvieran clasificadas como Gold.
 
 El resultado redujo considerablemente la lista de posibles sospechosos.
-
 
 >[!important]
 >**Miembros que coinciden con la descripción del testigo:**  
@@ -187,10 +185,9 @@ AND check_in_date = 20180109;
 **Anotación**  
 La declaración de Annabel Miller indicaba que había visto al sospechoso en el gimnasio el 9 de enero.
 
-Con esa información, decidí revisar los registros de entrada al gimnasio corresponiente a esa fecha, enfocándome únicamente en los dos miembros Gold cuyo número de membresía comenzaba con "48Z".
+Con esa información, decidí revisar los registros de entrada al gimnasio correspondientes a esa fecha, enfocándome únicamente en los dos miembros Gold cuyo número de membresía comenzaba con "48Z".
 
 El objetivo era comprobar cuál de los dos había estado presente ese día, tal como mencionó la testigo.
-
 
 >[!important]
 >**Resultado de la verificación:**  
@@ -223,10 +220,9 @@ WHERE plate_number LIKE ("%H42W%") AND LOWER(gender) = "male";
 **Anotación**  
 El primer testigo afirmó haber visto a un hombre salir de la escena del crimen subiendo a un vehículo cuya matrícula contenía la secuencia "H42W".
 
-Con esta información, decidí consultar los registros de licencias de conducir y vehículos de la ciudad, filtrando únicamente conductores masculinos cuyas placas incluyeran esa cadena específica.
+Con esta información decidí consultar los registros de licencias de conducir de la ciudad, donde también se almacenan los datos de los vehículos asociados a cada conductor, y filtré únicamente conductores masculinos cuyas placas incluyeran esa cadena específica.
 
 El objetivo era identificar posibles coincidencias que pudieran relacionarse con los sospechosos que ya habían aparecido en la investigación.
-
 
 >[!important]
 >**Resultado de la búsqueda:**  
@@ -279,7 +275,7 @@ Por ello y con el fin de recuperar el registro financiero correspondiente a Jere
 **Conclusión**  
 La cifra resulta considerablemente baja, especialmente teniendo en cuenta que Jeremy Bowers tiene 30 años de edad.
 
-Un ingreso anual de 10,500 dólares podría indicar una situación económica complicada, particularmente si el individuo vive de una manera independiente. Aunque esta información no prueba nada por sí sola, sí plantea una posibilidad: un posible motivo económico.
+Un ingreso anual de 10,500 dólares podría indicar una situación económica complicada, particularmente si el individuo vive de manera independiente. Aunque esta información no prueba nada por sí sola, sí plantea una posibilidad: un posible motivo económico.
 
 >[!warning]
 >Las cifras por si solas no son suficientes para demostrar culpabilidad.
@@ -301,9 +297,9 @@ WHERE name = "Jeremy Bowers";
 **Anotación**  
 Con Jeremy Bowers convertido en el principal sospechoso, el siguiente paso lógico era revisar su declaración oficial registrada en la base de datos.
 
-Para ello consulté la tabla interview, buscando específicamente la entrevista asociada al sospechoso.
+Para ello consulté la tabla *interview*, buscando específicamente la entrevista asociada al sospechoso.
 
-El objetivo era determinar si el sospechoso admitía algún tipo de implicación en el crimen o si su declaración contenia detalles que permitieran reconstruir mejor lo ocurrido.
+El objetivo era determinar si el sospechoso admitía algún tipo de implicación en el crimen o si su declaración contenía detalles que permitieran reconstruir mejor lo ocurrido.
 
 >[!important]
 >**Resultado de la declaración:**  
@@ -357,7 +353,7 @@ Aunque no conocía su nombre, sí recordaba varios detalles específicos: se tra
 Con esta información decidí acudir a los registros de licencias de conducción de SQL City, ya que si la mujer realmente posee ese vehículo, su información debería aparecer registrada junto con sus características físicas.
 
 >[!important]
->**Resultado búsqueda:**  
+>**Resultado de la búsqueda:**  
 >La consulta redujo la lista a tres posibles candidatas:
 >- Red Korb con ID 918773, estatura 65" y 48 años.
 >- Regina George con ID 291182, estatura 66" y 65 años.
@@ -366,7 +362,7 @@ Con esta información decidí acudir a los registros de licencias de conducción
 **Conclusión**  
 El caso comienza a cerrarse.
 
-De los 10007 registros de licencias en la ciudad, solo tres mujeres cumplen exactamente con la descripción proporcionada por Jeremy. Esto sugiere que la autora intelectual del asesinato probablemente se encuentra entre estas tres entidades.
+De los 10007 registros de licencias en la ciudad, solo tres mujeres cumplen exactamente con la descripción proporcionada por Jeremy. Esto sugiere que la autora intelectual del asesinato probablemente se encuentra entre estas tres personas.
 
 Sin embargo, aún falta una pieza clave del rompecabezas: Jeremy también mencionó que la mujer asistió tres veces al SQL Symphony Concert durante diciembre de 2017. 
 
@@ -375,10 +371,8 @@ Ese detalle es demasiado específico para ignorarlo.
 >[!warning]
 >Si logramos identificar cuál de estas tres mujeres asistió repetidamente a ese concierto, podremos identificar con certeza a la persona que planeó el asesinato y así cerrar el caso.
 
-
 >[!note]
 >El siguiente paso será consultar los registros de asistencia a eventos para verificar si alguna de estas tres personas aparece asociada al SQL Symphony Concert en 2017.
-
 
 ### Query 10 - Identificando a la Mente Maestra
 ```sql
@@ -399,7 +393,7 @@ HAVING COUNT(*) = 3;
 **Anotación**  
 La última pista proporcionada por Jeremy Bowers era particularmente específica: la mujer que lo contrató había asistido tres veces al SQL Symphony Concert durante diciembre de 2017.
 
-Con esa información decidí examinar los registros de facebook_event_checkin, donde se almacenan los eventos a los que han asistido los ciudadanos de SQL City.
+Con esa información decidí examinar los registros de *facebook_event_checkin*, donde se almacenan los eventos a los que han asistido los ciudadanos de SQL City.
 
 La consulta se centró exclusivamente en:
 
@@ -407,7 +401,7 @@ La consulta se centró exclusivamente en:
 - Fechas correspondientes a diciembre de 2017.
 - Personas que asistieron exactamente tres veces.
 
-Además, decidí enlazar estos registros con la tabla income con el fin de verificar si la persona identificada coincidía con la descripción de Jeremy: una mujer con mucho dinero.
+Además, decidí enlazar estos registros con la tabla *income* con el fin de verificar si la persona identificada coincidía con la descripción de Jeremy: una mujer con mucho dinero.
 
 >[!important]
 >**Resultado búsqueda:**  
@@ -419,12 +413,11 @@ Todas las piezas del rompecabezas finalmente encajan.
 
 La persona identificada, Miranda Priestly, cumple cada una de las condiciones reveladas durante la investigación:
 
-- Coinicide con la descripción física obtenida a partir de los registros de licencias.
+- Coincide con la descripción física obtenida a partir de los registros de licencias.
 - Conduce un Tesla Model S.
 - Posee cabello rojo y estatura aproximada mencionada por Jeremy.
 - Tiene un ingreso anual extremadamente alto, lo que concuerda con la afirmación de que *"era una mujer con mucho dinero"*.
 - Y, finalmente, asistió exactamente tres veces al SQL Symphony Concert en diciembre de 2017, tal como afirmó el ejecutor del crimen.
-
 
 >[!important]
 >Con toda la evidencia reunida queda claro que Miranda Priestly es la autora intelectual del asesinato.
@@ -444,7 +437,7 @@ SELECT value FROM solution;
 **Anotación**  
 Tras reunir múltiples pistas (los testimonios de los testigos, los registros del gimnasio, la coincidencia con la matrícula del vehículo y finalmente la declaración del propio sospechoso), todas las evidencias apuntaban hacia Jeremy Bowers como el autor material del crimen.
 
-Para confirmar oficialmente esta conclusión dentro del sistema de investigación, procedí a registrar su nombre en la tabla solution, utilizada por la plataforma para verificar si el culpable identificado coincide con el asesino real.
+Para confirmar oficialmente esta conclusión dentro del sistema de investigación, procedí a registrar su nombre en la tabla *solution*, utilizada por la plataforma para verificar si el culpable identificado coincide con el asesino real.
 
 >[!important]
 >**Resultado de la verificación:**  
@@ -461,7 +454,7 @@ Con esta verificación queda demostrado que la investigación siguió el rastro 
 >A lo largo de la investigación ya se logró identificar a una posible autora intelectual: Miranda Priestly, quien coincide con todas las características descritas por Jeremy y con los registros del concierto.
 
 >[!note]
->Aún falta realizar la verificación final dentro del sistema para verificar oficialmente que Miranda Priestly es la verdadera mente maestra detrás del crimen.
+>Aún falta realizar la verificación final dentro del sistema para confirmar oficialmente que Miranda Priestly es la verdadera mente maestra detrás del crimen.
 
 ### Query 12 - Confirmación de la Mente Maestra
 ```sql
@@ -478,9 +471,9 @@ Tras seguir cada pista con precisión (desde los testimonios de Jeremy Bowers ha
 
 Jeremy Bowers había confesado que fue contratado por una mujer con mucho dinero, describiéndola además con varias características muy concretas: cabello rojo, estatura aproximada entre 65 y 67 pulgadas, propietaria de un Tesla Model S y asistente frecuente al SQL Symphony Concert en diciembre de 2017.
 
-Las consultas realizadas en las tablas de drivers_license y facebook_event_checkin perimitieron identificar a una única persona que coincidía con todos esos elementos. Sin embargo, como en todo buen caso policial, era necesario confirmar oficialmente la conclusión dentro del sistema de investigación.
+Las consultas realizadas en las tablas de *drivers_license* y *facebook_event_checkin* permitieron identificar a una única persona que coincidía con todos esos elementos. Sin embargo, como en todo buen caso policial, era necesario confirmar oficialmente la conclusión dentro del sistema de investigación.
 
-Para ello se registró el nombre de la sospechosa en la tabla solution, del mismo modo en que se había hecho previamente con el asesino material.
+Para ello se registró el nombre de la sospechosa en la tabla *solution*, del mismo modo en que se había hecho previamente con el asesino material.
 
 >[!important]
 >**Resultado de la verificación:**  
@@ -499,7 +492,7 @@ El caso finalmente queda completamente solucionado:
 
 Cada pieza de información permitió reconstruir cuidadosamente los hechos hasta revelar la verdad.
 
-Lo que comenzó como un caso complicado, con un informe de escena de crimen perdido, terminó resolviéndose gracias a un meticuloso análisis de los datos almacenados en la base de SQL City.
+Lo que comenzó como un caso complicado, con un informe de la escena del crimen perdido, terminó resolviéndose gracias a un meticuloso análisis de los datos almacenados en la base de SQL City.
 
 >[!important]
 >**Estado del Caso:** Resuelto
